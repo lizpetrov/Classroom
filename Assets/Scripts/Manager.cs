@@ -53,7 +53,7 @@ public class Manager : MonoBehaviour {
 	}
 
 
-	IEnumerator GetStudentsInClass(int periodNumber, string teacherName){
+	public static IEnumerator GetStudentsInClass(int periodNumber, string teacherName){
 		string hash = MD5.Md5Sum (periodNumber + teacherName + key);
 		string getURL = getEntryURL + "periodNumber=" + periodNumber + "&teacherName=" + WWW.EscapeURL(teacherName) + "&hash=" + hash;
 

@@ -1,11 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour {
 
 	public Canvas mainCanvas;
 	public Canvas registerCanvas;
+
+	public Text titleText;
 
 	//register
 	public InputField firstname;
@@ -50,11 +53,20 @@ public class UIManager : MonoBehaviour {
 		else
 			gender = "F";
 
-		Manager.Register (firstname.text, lastname.text, email.text, password.text, int.Parse(grade.text.Trim()), gender,
-			periodTeachers[0].text, periodTeachers[1].text, periodTeachers[2].text, periodTeachers[3].text, 
-			periodTeachers[4].text, periodTeachers[5].text);
+		try{
+			Manager.Register (firstname.text, lastname.text, email.text, password.text, int.Parse(grade.text.Trim()), gender,
+				periodTeachers[0].text, periodTeachers[1].text, periodTeachers[2].text, periodTeachers[3].text, 
+				periodTeachers[4].text, periodTeachers[5].text);	
+			mainCanvas.enabled = true;
+			registerCanvas.enabled = false;
+		}
+		catch(Exception e){
+			titleText.fontSize = 35;
+			titleText.text = "Dude stop take this seriously";
+		}
+	}
 
-		mainCanvas.enabled = true;
-		registerCanvas.enabled = false;
+	public void GetStudents(int periodNumber){
+		Manager.GetStudentsInClass (periodNumber, periodTeachers[periodNumber - 1].text.Trim());
 	}
 }
