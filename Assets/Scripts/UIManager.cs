@@ -31,6 +31,7 @@ public class UIManager : MonoBehaviour {
 	//portal
 	public GameObject selectionPage;
 	public GameObject studentTable;
+	public Text portalTitleText;
 	public Text[] studentTexts;
 	public Canvas updateCanvas;
 	public InputField[] updatePeriodTeachers;
@@ -39,6 +40,7 @@ public class UIManager : MonoBehaviour {
 	public static string addEntryURL = "http://www.classreveal.com/register.php?";
 	public static string loginURL = "http://www.classreveal.com/login.php?";
 	public static string getEntryURL = "http://www.classreveal.com/getStudents.php?";
+	public static string updateURL = "http://www.classreveal.com/update.php?";
 
 	void Update(){
 		if (registerCanvas.enabled) {
@@ -65,7 +67,7 @@ public class UIManager : MonoBehaviour {
 		updateCanvas.enabled = false;
 	}
 
-	public void UpdateTeachers(){
+	public void ShowUpdateCanvas(){
 		mainCanvas.enabled = false;
 		portalCanvas.enabled = false;
 		registerCanvas.enabled = false;
@@ -109,7 +111,14 @@ public class UIManager : MonoBehaviour {
 	}
 
 	public void GetStudents(int periodNumber){
-		StartCoroutine (GetStudentsInClass (periodNumber, periodTeachers[periodNumber - 1].text.Trim()));
+		StartCoroutine (GetStudentsInClass (periodNumber, updatePeriodTeachers[periodNumber - 1].text.Trim()));
+	}
+
+	public void UpdateUser(){
+		StartCoroutine (Update(id, updatePeriodTeachers[0].text.Trim(), updatePeriodTeachers[1].text.Trim(),
+			updatePeriodTeachers[2].text.Trim(), updatePeriodTeachers[3].text.Trim(),
+			updatePeriodTeachers[4].text.Trim(), updatePeriodTeachers[5].text.Trim(),
+			updatePeriodTeachers[6].text.Trim(), updatePeriodTeachers[7].text.Trim()));
 	}
 
 	IEnumerator Register(string firstName, string lastName, string email, string password, int grade, string gender, 
@@ -130,9 +139,9 @@ public class UIManager : MonoBehaviour {
 
 		if (post.error != null) {
 			Debug.LogError ("Error: " + post.error);
-		} 
-		else {
-			Debug.Log (post.text); 
+		} else {
+			loginText.fontSize = 32;
+			loginText.text = "Successfully Registered";
 		}
 	}
 
@@ -145,10 +154,10 @@ public class UIManager : MonoBehaviour {
 			Debug.LogError ("Error: " + loginUser.error);
 		} 
 		else {
-			Debug.Log (loginUser.text);
 			string[] tokens = loginUser.text.Split (' ');
-			for(int i = 1; i < tokens.Length - 1; i++){
-				updatePeriodTeachers [i - 1].text = tokens [1].Trim ();
+			id = int.Parse (tokens[1].Trim());
+			for(int i = 2; i < tokens.Length; i++){
+				updatePeriodTeachers [i - 2].text = tokens [i].Trim ();
 			}
 			if (password.Equals (tokens[0])) {//login success
 				mainCanvas.enabled = false;
@@ -180,29 +189,24 @@ public class UIManager : MonoBehaviour {
 			}
 		}
 	}
-	/*
-	IEnumerator Update(){
-		//string url = loginURL + "email=" + WWW.EscapeURL (email);
-		WWW loginUser = new WWW (url);
-		yield return loginUser;
 
-		if (loginUser.error != null) {
-			Debug.LogError ("Error: " + loginUser.error);
+	IEnumerator Update(int userid, string period1TeacherName, string period2TeacherName, string period3TeacherName, 
+		string period4TeacherName, string period5TeacherName, string period6TeacherName, string period7TeacherName, string period8TeacherName){
+		string url = updateURL + "userid=" + userid +
+			"&period1=" + WWW.EscapeURL(period1TeacherName) + "&period2=" + WWW.EscapeURL(period2TeacherName) + 
+			"&period3=" + WWW.EscapeURL(period3TeacherName) + "&period4=" + WWW.EscapeURL(period4TeacherName) + 
+			"&period5=" + WWW.EscapeURL(period5TeacherName) + "&period6=" + WWW.EscapeURL(period6TeacherName) + 
+			"&period7=" + WWW.EscapeURL(period7TeacherName) + "&period8=" + WWW.EscapeURL(period8TeacherName);
+		WWW updateUser = new WWW (url);
+		yield return updateUser;
+
+		if (updateUser.error != null) {
+			Debug.LogError ("Error: " + updateUser.error);
 		} 
 		else {
-			Debug.Log (loginUser.text);
-			string[] tokens = loginUser.text.Split (' ');
-			for(int i = 1; i < tokens.Length - 1; i++){
-				updatePeriodTeachers [i - 1].text = tokens [1].Trim ();
-			}
-			if (password.Equals (tokens[0])) {//login success
-				mainCanvas.enabled = false;
-				portalCanvas.enabled = true;
-			} 
-			else {
-				loginText.fontSize = 32;
-				loginText.text = "Email/Password incorrect!";
-			}
+			portalTitleText.text = "Successfully Updated";
+			portalCanvas.enabled = true;
+			updateCanvas.enabled = false;
 		}
-	}*/
+	}
 }
