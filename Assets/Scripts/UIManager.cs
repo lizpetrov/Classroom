@@ -104,7 +104,7 @@ public class UIManager : MonoBehaviour {
 		}
 		catch(Exception e){
 			titleText.fontSize = 35;
-			titleText.text = "Dude stop take this seriously";
+			titleText.text = "Please fill in all fields.";
 		}
 	}
 
