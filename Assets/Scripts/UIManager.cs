@@ -55,13 +55,20 @@ public class UIManager : MonoBehaviour {
 		}
 	}
 
+	public void OpenMainPage(){
+		mainCanvas.enabled = true;
+		portalCanvas.enabled = false;
+		registerCanvas.enabled = false;
+		updateCanvas.enabled = false;
+	}
+
 	public void OpenRegisterPage(){
 		mainCanvas.enabled = false;
 		portalCanvas.enabled = false;
 		registerCanvas.enabled = true;
 		updateCanvas.enabled = false;
 	}
-
+		
 	public void BackToPortal(){
 		mainCanvas.enabled = false;
 		portalCanvas.enabled = true;
@@ -103,6 +110,7 @@ public class UIManager : MonoBehaviour {
 			registerCanvas.enabled = false;
 		}
 		catch(Exception e){
+			Debug.Log (e.Message);
 			titleText.fontSize = 35;
 			titleText.text = "Please fill in all fields.";
 		}
@@ -157,12 +165,17 @@ public class UIManager : MonoBehaviour {
 		} 
 		else {
 			string[] tokens = loginUser.text.Split (' ');
-			id = int.Parse (tokens[1].Trim());
-			schoolID = int.Parse (tokens[2].Trim());
+			try{
+				id = int.Parse (tokens[1].Trim());
+				schoolID = int.Parse (tokens[2].Trim());
+			}
+			catch(Exception e){
+				Debug.Log (e.Message);
+			}
 			for(int i = 3; i < tokens.Length; i++){
 				updatePeriodTeachers [i - 3].text = tokens [i].Trim ();
 			}
-			if (password.Equals (tokens[0])) {//login success
+			if (password.Equals (tokens[0]) && !password.Equals("")) {//login success
 				mainCanvas.enabled = false;
 				portalCanvas.enabled = true;
 			} 
