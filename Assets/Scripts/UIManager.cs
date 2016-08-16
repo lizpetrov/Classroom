@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour {
 	public Text titleText;
 
 	public int id;
+	public int schoolID;//aka school index
 
 	//login
 	public InputField loginEmail;
@@ -27,6 +28,7 @@ public class UIManager : MonoBehaviour {
 	public Toggle female;
 	public Toggle hotpotato;
 	public InputField[] periodTeachers;
+	public Dropdown school;
 
 	//portal
 	public GameObject selectionPage;
@@ -96,7 +98,7 @@ public class UIManager : MonoBehaviour {
 		try{
 			StartCoroutine( Register(firstname.text, lastname.text, registerEmail.text, registerPassword.text, int.Parse(grade.text.Trim()), gender,
 				periodTeachers[0].text.Trim (), periodTeachers[1].text.Trim (), periodTeachers[2].text.Trim (), periodTeachers[3].text.Trim (), 
-				periodTeachers[4].text.Trim (), periodTeachers[5].text.Trim(), periodTeachers[6].text.Trim(), periodTeachers[7].text.Trim()));	
+				periodTeachers[4].text.Trim (), periodTeachers[5].text.Trim(), periodTeachers[6].text.Trim(), periodTeachers[7].text.Trim(), school.value));	
 			mainCanvas.enabled = true;
 			registerCanvas.enabled = false;
 		}
@@ -111,7 +113,7 @@ public class UIManager : MonoBehaviour {
 	}
 
 	public void GetStudents(int periodNumber){
-		StartCoroutine (GetStudentsInClass (periodNumber, updatePeriodTeachers[periodNumber - 1].text.Trim()));
+		StartCoroutine (GetStudentsInClass (periodNumber, updatePeriodTeachers[periodNumber - 1].text.Trim(), schoolID));
 	}
 
 	public void UpdateUser(){
@@ -123,16 +125,16 @@ public class UIManager : MonoBehaviour {
 
 	IEnumerator Register(string firstName, string lastName, string email, string password, int grade, string gender, 
 		string period1TeacherName, string period2TeacherName, string period3TeacherName, 
-		string period4TeacherName, string period5TeacherName, string period6TeacherName, string period7TeacherName, string period8TeacherName){
+		string period4TeacherName, string period5TeacherName, string period6TeacherName, string period7TeacherName, string period8TeacherName, int schoolIndex){
 		string hash = MD5.Md5Sum (firstName + lastName + email + password + key);
-		string postURL = addEntryURL + "firstName=" + WWW.EscapeURL(firstName) + "&lastName=" + WWW.EscapeURL(lastName) + 
-			"&email=" + WWW.EscapeURL(email) + "&password=" + WWW.EscapeURL(password) + 
-			"&grade=" + grade + "&gender=" + WWW.EscapeURL(gender) + 
-			"&period1TeacherName=" + WWW.EscapeURL(period1TeacherName) + "&period2TeacherName=" + WWW.EscapeURL(period2TeacherName) + 
-			"&period3TeacherName=" + WWW.EscapeURL(period3TeacherName) + "&period4TeacherName=" + WWW.EscapeURL(period4TeacherName) + 
-			"&period5TeacherName=" + WWW.EscapeURL(period5TeacherName) + "&period6TeacherName=" + WWW.EscapeURL(period6TeacherName) + 
-			"&period7TeacherName=" + WWW.EscapeURL(period7TeacherName) + "&period8TeacherName=" + WWW.EscapeURL(period8TeacherName) +
-			"&hash=" + hash;	
+		string postURL = addEntryURL + "firstName=" + WWW.EscapeURL (firstName) + "&lastName=" + WWW.EscapeURL (lastName) +
+		                 "&email=" + WWW.EscapeURL (email) + "&password=" + WWW.EscapeURL (password) +
+		                 "&grade=" + grade + "&gender=" + WWW.EscapeURL (gender) +
+		                 "&period1TeacherName=" + WWW.EscapeURL (period1TeacherName) + "&period2TeacherName=" + WWW.EscapeURL (period2TeacherName) +
+		                 "&period3TeacherName=" + WWW.EscapeURL (period3TeacherName) + "&period4TeacherName=" + WWW.EscapeURL (period4TeacherName) +
+		                 "&period5TeacherName=" + WWW.EscapeURL (period5TeacherName) + "&period6TeacherName=" + WWW.EscapeURL (period6TeacherName) +
+		                 "&period7TeacherName=" + WWW.EscapeURL (period7TeacherName) + "&period8TeacherName=" + WWW.EscapeURL (period8TeacherName) +
+		                 "&school=" + schoolIndex + "&hash=" + hash;
 
 		WWW post = new WWW (postURL);
 		yield return post;
@@ -156,8 +158,9 @@ public class UIManager : MonoBehaviour {
 		else {
 			string[] tokens = loginUser.text.Split (' ');
 			id = int.Parse (tokens[1].Trim());
-			for(int i = 2; i < tokens.Length; i++){
-				updatePeriodTeachers [i - 2].text = tokens [i].Trim ();
+			schoolID = int.Parse (tokens[2].Trim());
+			for(int i = 3; i < tokens.Length; i++){
+				updatePeriodTeachers [i - 3].text = tokens [i].Trim ();
 			}
 			if (password.Equals (tokens[0])) {//login success
 				mainCanvas.enabled = false;
@@ -170,9 +173,10 @@ public class UIManager : MonoBehaviour {
 		}
 	}
 
-	IEnumerator GetStudentsInClass(int periodNumber, string teacherName){
+	IEnumerator GetStudentsInClass(int periodNumber, string teacherName, int schoolIndex){
 		string hash = MD5.Md5Sum (periodNumber + teacherName + key);
-		string getURL = getEntryURL + "periodNumber=" + periodNumber + "&teacherName=" + WWW.EscapeURL(teacherName) + "&hash=" + hash;
+		string getURL = getEntryURL + "periodNumber=" + periodNumber + "&teacherName=" + WWW.EscapeURL (teacherName) +
+		                "&schoolID=" + schoolIndex + "&hash=" + hash;
 
 		WWW getStudents = new WWW (getURL);
 		yield return getStudents;
